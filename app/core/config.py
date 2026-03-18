@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     # CORS — comma-separated list of allowed origins
     ALLOWED_ORIGINS: List[str] = ["http://localhost:3000"]
 
+    # Groq (chatbot)
+    GROQ_API_KEY: str = ""
+
     # Admin routes protection
     ADMIN_API_KEY: str = ""
 

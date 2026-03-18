@@ -26,15 +26,19 @@ class VenueDetail(VenueSummary):
     phone: Optional[str] = None
     website: Optional[str] = None
     whatsapp: Optional[str] = None
-    entry_fee: Optional[str] = None
     min_spend: Optional[str] = None
-    dress_code: Optional[str] = None
     camera_policy: Optional[str] = None
     age_restriction: Optional[str] = None
     photos: list = []
     opening_hours: Optional[Any] = None
     created_at: datetime
     updated_at: datetime
+
+
+class VenueNearby(VenueSummary):
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    distance_km: float
 
 
 class DistrictCount(BaseModel):

@@ -2,15 +2,10 @@ import json
 import logging
 import re
 
-import google.generativeai as genai
-
-from app.core.config import settings
+from app.core.gemini import model as _model
 from app.core.supabase import supabase
 
 logger = logging.getLogger(__name__)
-
-genai.configure(api_key=settings.GEMINI_API_KEY)
-_model = genai.GenerativeModel("gemini-2.5-flash")
 
 BATCH_SIZE = 20
 

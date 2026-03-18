@@ -3,7 +3,7 @@ from typing import Optional, Literal
 from collections import Counter
 from app.core.supabase import supabase
 from app.schemas.venue import (
-    VenueSummary, VenueDetail, VenueListResponse, DistrictCount, CategoryCount
+    VenueSummary, VenueDetail, VenueListResponse, VenueNearby, DistrictCount, CategoryCount
 )
 
 router = APIRouter()
@@ -23,6 +23,30 @@ async def list_categories():
     response = supabase.table("venues").select("category").eq("is_active", True).execute()
     counts = Counter(r["category"] for r in response.data if r.get("category"))
     return [{"category": c, "count": n} for c, n in counts.most_common()]
+
+
+@router.get("/nearby", response_model=list[VenueNearby])
+async def nearby_venues(
+    lat: float = Query(..., description="User latitude"),
+    lng: float = Query(..., description="User longitude"),
+    radius_km: float = Query(5.0, ge=0.5, le=50, description="Search radius in km"),
+    limit: int = Query(20, ge=1, le=50),
+):
+    """
+    Find venues near a GPS coordinate, sorted by distance.
+
+    - **lat** / **lng**: user's current location
+    - **radius_km**: search radius (default 5 km, max 50 km)
+    """
+    rows = supabase.rpc(
+        "nearby_venues",
+        {"user_lat": lat, "user_lng": lng, "radius_km": radius_km, "result_limit": limit},
+    ).execute().data
+
+    return [
+        {**row, "cover_photo": row["photos"][0] if row.get("photos") else None}
+        for row in rows
+    ]
 
 
 @router.get("", response_model=VenueListResponse)

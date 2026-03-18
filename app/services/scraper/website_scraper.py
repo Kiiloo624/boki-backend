@@ -3,15 +3,11 @@ import logging
 import re
 from urllib.parse import urljoin, urlparse
 
-import google.generativeai as genai
 from scrapling.fetchers import AsyncFetcher
 
-from app.core.config import settings
+from app.core.gemini import model as _model
 
 logger = logging.getLogger(__name__)
-
-genai.configure(api_key=settings.GEMINI_API_KEY)
-_model = genai.GenerativeModel("gemini-2.5-flash")
 
 # Social/app URLs that will never contain venue policy text
 SKIP_DOMAINS = {
@@ -27,9 +23,7 @@ Venue name: {name}
 
 Return ONLY a valid JSON object with these fields (use null if not found on the page):
 {{
-  "entry_fee": "e.g. ₦2,000 ladies / ₦5,000 guys, or null",
-  "min_spend": "e.g. ₦10,000 per table, or null",
-  "dress_code": "e.g. Smart casual, no caps, or null",
+  "min_spend": "e.g. N10,000 per table, or null",
   "camera_policy": "e.g. No professional cameras, or null",
   "whatsapp": "phone number used for WhatsApp, or null",
   "landmark_directions": "human-readable directions e.g. Opposite First Bank on Ademola Adetokunbo, or null"

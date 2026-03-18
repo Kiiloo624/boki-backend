@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from app.services.scraper.pipeline import scrape_and_save, DEFAULT_QUERIES
 from app.services.scraper.enricher import enrich_venues
 from app.services.scraper.price_inferencer import infer_price_ranges
+from app.services.scraper.landmark_inferencer import infer_landmark_directions
 from app.api.deps import require_admin_key
 
 router = APIRouter(dependencies=[Depends(require_admin_key)])
@@ -64,6 +65,23 @@ async def run_price_inferencer(background_tasks: BackgroundTasks, limit: int | N
     async def _run():
         try:
             result = await infer_price_ranges(limit=limit)
+            _jobs[job_id] = {"status": "done", "result": result}
+        except Exception as e:
+            _jobs[job_id] = {"status": "error", "result": str(e)}
+
+    background_tasks.add_task(_run)
+    return {"job_id": job_id, "status": "running"}
+
+
+@router.post("/infer-landmarks")
+async def run_landmark_inferencer(background_tasks: BackgroundTasks, limit: int | None = None):
+    """Infer landmark_directions for venues via Gemini. Runs in the background."""
+    job_id = str(uuid.uuid4())
+    _jobs[job_id] = {"status": "running", "result": None}
+
+    async def _run():
+        try:
+            result = await infer_landmark_directions(limit=limit)
             _jobs[job_id] = {"status": "done", "result": result}
         except Exception as e:
             _jobs[job_id] = {"status": "error", "result": str(e)}

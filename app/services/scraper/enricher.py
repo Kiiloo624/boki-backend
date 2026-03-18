@@ -5,7 +5,7 @@ from app.core.supabase import supabase
 logger = logging.getLogger(__name__)
 
 # Fields we consider "missing" — if all are null, venue needs enrichment
-ENRICHABLE_FIELDS = ["entry_fee", "min_spend", "dress_code", "camera_policy", "whatsapp"]
+ENRICHABLE_FIELDS = ["min_spend", "camera_policy", "whatsapp"]
 
 
 async def enrich_venues(limit: int = 20) -> dict:
@@ -18,8 +18,7 @@ async def enrich_venues(limit: int = 20) -> dict:
         supabase.table("venues")
         .select("id, name, website")
         .not_.is_("website", "null")
-        .is_("entry_fee", "null")
-        .is_("dress_code", "null")
+        .is_("min_spend", "null")
         .limit(limit)
         .execute()
     )
