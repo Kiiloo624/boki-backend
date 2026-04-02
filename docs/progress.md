@@ -41,6 +41,15 @@
 - `POST /scraper/enrich` — enrich venues via website scraping + Gemini
 - `POST /scraper/infer-prices` — infer price_range via Gemini for all venues
 - `GET /scraper/status/{job_id}` — poll background job status
+- `GET /admin/stats` — dashboard aggregate stats
+- `POST /admin/venues` — create venue manually (auto-generates slug)
+- `PATCH /admin/venues/{slug}` — partial update venue fields
+- `DELETE /admin/venues/{slug}` — soft-delete (or hard-delete with `?permanent=true`)
+- `PATCH /admin/venues/{slug}/photos` — replace photos array
+- `GET /admin/reviews` — list all reviews cross-venue (filterable, page/page_size)
+- `POST /admin/reviews` — add curated review
+- `PATCH /admin/reviews/{id}` — update review
+- `DELETE /admin/reviews/{id}` — permanently delete review
 
 ### Public API
 - `GET /venues` — list with filters (category, district, price_range, search, is_verified), sort, pagination
@@ -57,10 +66,11 @@
 - `POST /scraper/infer-prices` — infer price_range via Gemini for all venues
 - `POST /scraper/infer-landmarks` — infer landmark_directions via Gemini for all venues
 - `GET /scraper/status/{job_id}` — poll background job status
+- See "Admin Routes" block above for the full `/admin/*` endpoint list
 
 ### Pydantic Schemas
-- `app/schemas/venue.py` — VenueSummary, VenueDetail, VenueNearby, DistrictCount, CategoryCount, VenueListResponse
-- `app/schemas/review.py` — ReviewOut, ReviewListResponse
+- `app/schemas/venue.py` — VenueSummary, VenueDetail, VenueNearby, DistrictCount, CategoryCount, VenueListResponse, VenueCreate, VenueUpdate, VenuePhotosUpdate, AdminStats
+- `app/schemas/review.py` — ReviewOut, ReviewListResponse, ReviewCreate, ReviewUpdate
 
 ### Data
 - **469 venues** in Supabase across Abuja
@@ -136,6 +146,7 @@ Response shape: `{ reply: str, venues: [...] }`
 | `app/api/routes/venues.py` | Public venues endpoints (incl. /nearby) |
 | `app/api/routes/reviews.py` | Public reviews endpoint |
 | `app/api/routes/chat.py` | Chatbot endpoint |
+| `app/api/routes/admin.py` | Admin CRUD endpoints (venues, reviews, stats) |
 | `app/main.py` | FastAPI app + route registration |
 | `docs/progress.md` | This file |
 | `docs/api.md` | Flutter integration reference |
